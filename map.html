@@ -11,19 +11,23 @@
             padding: 0;
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
+            overflow: hidden; /* Previene lo scrolling */
         }
         #map {
-            width: 100%;
-            height: 700px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            margin-bottom: 0;
-            position: relative;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
+            margin: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
         }
         .custom-tooltip {
             background-color: #e02020;
@@ -62,11 +66,153 @@
             height: 280px;
             object-fit: cover;
             border: 2px solid white;
-            border-radius: 4px;
+            border-radius: 4px 4px 0 0; /* Arrotonda solo gli angoli superiori */
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            /* Aggiungi transizione per l'effetto di comparsa/scomparsa */
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+        }
+        .image-visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        /* Stile per le didascalie degli indirizzi */
+        .image-caption {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 0 0 4px 4px; /* Arrotonda solo gli angoli inferiori */
+            border: 2px solid white;
+            border-top: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            max-width: 280px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+        }
+        .caption-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         .leaflet-marker-icon img {
             pointer-events: none;
+        }
+        /* Stile per l'animazione di completamento */
+        .route-completed {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(224, 32, 32, 0.85);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            pointer-events: none;
+        }
+        .route-completed.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+            animation: pulse 1.5s infinite alternate;
+        }
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.1);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+            }
+        }
+        /* Stile per la bandierina di arrivo */
+        .finish-flag {
+            position: relative;
+            width: 45px;
+            height: 35px;
+            background-color: transparent;
+            display: block;
+            animation: flagAppear 0.5s ease-out, flagWave 2s ease-in-out infinite;
+            z-index: 999;
+            transform-origin: left center;
+            overflow: hidden;
+            border-radius: 2px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .finish-flag::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, #000 25%, transparent 25%),
+                linear-gradient(-45deg, #000 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #000 75%),
+                linear-gradient(-45deg, transparent 75%, #000 75%);
+            background-size: 10px 10px;
+            background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+            top: 0;
+            left: 0;
+        }
+        /* Aggiunta di un'asta per la bandiera */
+        .flag-pole {
+            position: absolute;
+            width: 4px;
+            height: 40px;
+            background: #888;
+            border-radius: 2px;
+            left: -2px;
+            top: -2px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        @keyframes flagWave {
+            0% {
+                transform: skewX(0deg) rotate(0deg);
+            }
+            25% {
+                transform: skewX(-12deg) rotate(3deg);
+            }
+            50% {
+                transform: skewX(0deg) rotate(0deg);
+            }
+            75% {
+                transform: skewX(-8deg) rotate(-2deg);
+            }
+            100% {
+                transform: skewX(0deg) rotate(0deg);
+            }
+        }
+        @keyframes flagAppear {
+            0% {
+                transform: scale(0) translateY(20px);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.1) translateY(-5px);
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes flagBounce {
+            0% {
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                transform: translateY(5px) scale(1.05);
+            }
         }
         /* Stile personalizzato per il controllo dei layer in rosso e bianco */
         .custom-map-control {
@@ -104,12 +250,67 @@
             color: white;
             border-color: #e02020;
         }
+        
+        /* Stile per l'indicatore di distanza */
+        .distance-indicator {
+            position: absolute;
+            background-color: rgba(224, 32, 32, 0.85);
+            color: white;
+            padding: 5px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            pointer-events: none;
+            transform: translate(-50%, -130%);
+            min-width: 50px;
+            text-align: center;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        /* Icona della destinazione per l'indicatore di distanza */
+        .distance-indicator .dest-icon {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #fff;
+            border-radius: 50%;
+            position: relative;
+            margin-right: 3px;
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+        .distance-indicator .dest-icon::before {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 7px;
+            height: 7px;
+            background-color: #fff;
+            box-shadow: 0 0 2px rgba(0,0,0,0.3);
+        }
+        .distance-indicator .dest-icon::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #e02020;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div id="map">
             <!-- Il logo verrà aggiunto tramite JavaScript -->
+            <div class="route-completed">Ziel Erreicht!</div>
         </div>
     </div>
 
@@ -213,6 +414,21 @@
             iconSize: [16, 16]
         });
 
+        // Icona per la bandierina di arrivo
+        const finishFlagIcon = L.divIcon({
+            html: '<div class="flag-pole"></div><div class="finish-flag"></div>',
+            className: 'finish-flag-icon',
+            iconSize: [45, 40],
+            iconAnchor: [0, 40] // Ancoraggio in basso a sinistra, dove si trova l'asta
+        });
+        
+        // Placeholder per il marker della bandierina
+        let finishFlagMarker = null;
+        
+        // Placeholder per i marker delle immagini
+        let startImageMarker = null;
+        let endImageMarker = null;
+
         // Aggiunta dei marker con tooltip
         L.marker([gpxData[0].lat, gpxData[0].lon], { icon: startIcon })
             .bindTooltip('DU BIST HIER', {
@@ -233,25 +449,51 @@
             .addTo(map);
 
         // Aggiunta delle immagini sempre visibili
-        // Immagine punto di partenza
-        L.marker([gpxData[0].lat + 0.0005, gpxData[0].lon + 0.0012], {
-            icon: L.divIcon({
-                html: '<img src="main.jpg" class="permanent-image">',
+        // Immagine punto di partenza - inizialmente non visibile
+        function createStartImageMarker() {
+            // Posizione per l'immagine, leggermente spostata rispetto al marker
+            const imagePosition = [gpxData[0].lat + 0.0005, gpxData[0].lon + 0.0012];
+            
+            // Crea una custom icon con immagine e didascalia
+            const startIcon = L.divIcon({
+                html: `
+                    <div class="image-container">
+                        <img src="main.jpg" class="permanent-image">
+                        <div class="image-caption">Zürcherstrasse 34, 8604 Volketswil</div>
+                    </div>
+                `,
                 className: 'image-icon',
-                iconSize: [280, 280],
+                iconSize: [280, 320], // Aumenta l'altezza per accomodare la didascalia
                 iconAnchor: [140, 140]
-            })
-        }).addTo(map);
+            });
+            
+            startImageMarker = L.marker(imagePosition, { icon: startIcon });
+        }
 
-        // Immagine punto di arrivo
-        L.marker([gpxData[gpxData.length - 1].lat + 0.0005, gpxData[gpxData.length - 1].lon + 0.0012], {
-            icon: L.divIcon({
-                html: '<img src="platz2.jpg" class="permanent-image">',
+        // Immagine punto di arrivo - inizialmente non visibile
+        function createEndImageMarker() {
+            // Posizione per l'immagine, leggermente spostata rispetto al marker
+            const imagePosition = [gpxData[gpxData.length - 1].lat + 0.0005, gpxData[gpxData.length - 1].lon + 0.0012];
+            
+            // Crea una custom icon con immagine e didascalia
+            const endIcon = L.divIcon({
+                html: `
+                    <div class="image-container">
+                        <img src="platz2.jpg" class="permanent-image">
+                        <div class="image-caption">Büelstrasse 35, 8604 Volketswil</div>
+                    </div>
+                `,
                 className: 'image-icon',
-                iconSize: [280, 280],
+                iconSize: [280, 320], // Aumenta l'altezza per accomodare la didascalia
                 iconAnchor: [140, 140]
-            })
-        }).addTo(map);
+            });
+            
+            endImageMarker = L.marker(imagePosition, { icon: endIcon });
+        }
+        
+        // Inizializza i marker delle immagini (senza aggiungerli alla mappa)
+        createStartImageMarker();
+        createEndImageMarker();
 
         // Marker per l'animazione
         const markerIcon = L.divIcon({
@@ -267,7 +509,14 @@
         const animationDuration = 15; // durata totale in secondi, ridotta a 15 secondi
         let playing = true;
         let lastTimestamp = 0;
-
+        let completionMessageShown = false; // Flag per controllare se il messaggio è già stato mostrato
+        let initialPauseComplete = false; // Flag per la pausa iniziale
+        let initialPauseDuration = 2.5; // Durata della pausa iniziale in secondi, ridotta a 2.5
+        let initialPauseStartTime = 0; // Momento di inizio della pausa iniziale
+        let endPauseDuration = 2.5; // Durata della pausa finale in secondi, ridotta a 2.5
+        const totalRouteDistance = 850; // Distanza totale del percorso in metri
+        let distanceIndicator = null; // Riferimento all'elemento dell'indicatore di distanza
+        
         // Prepara le distanze cumulative per ogni segmento del percorso
         const cumulativeDistances = [];
         let totalDistance = 0;
@@ -319,9 +568,35 @@
 
         // Funzione di animazione con velocità costante reale
         function animate(timestamp) {
-            if (!lastTimestamp) lastTimestamp = timestamp;
+            if (!lastTimestamp) {
+                lastTimestamp = timestamp;
+                initialPauseStartTime = timestamp; // Inizializza il tempo di inizio della pausa
+                showStartImage(); // Mostra subito l'immagine di partenza
+                createDistanceIndicator(); // Crea l'indicatore di distanza ma lo nascondiamo all'inizio
+                distanceIndicator.style.visibility = 'hidden';
+            }
+            
             const deltaTime = (timestamp - lastTimestamp) / 1000; // tempo in secondi
             lastTimestamp = timestamp;
+            
+            // Gestione della pausa iniziale
+            if (!initialPauseComplete) {
+                const elapsedPauseTime = (timestamp - initialPauseStartTime) / 1000;
+                
+                if (elapsedPauseTime >= initialPauseDuration) {
+                    initialPauseComplete = true;
+                    hideStartImage(); // Nascondi l'immagine all'inizio del movimento
+                    // Mostriamo l'indicatore quando inizia il movimento
+                    distanceIndicator.style.visibility = 'visible';
+                } else {
+                    // Durante la pausa iniziale manteniamo il marker al punto di partenza
+                    marker.setLatLng([gpxData[0].lat, gpxData[0].lon]);
+                    updateDistanceIndicatorPosition([gpxData[0].lat, gpxData[0].lon]);
+                    map.panTo([gpxData[0].lat, gpxData[0].lon]);
+                    requestAnimationFrame(animate);
+                    return; // Usciamo dalla funzione per mantenere il marker fermo
+                }
+            }
             
             if (playing) {
                 // Calcolo della velocità in base alla distanza totale e al tempo di animazione
@@ -335,10 +610,39 @@
                 // Aggiornamento del tempo di animazione in base alla proporzione di distanza percorsa
                 animationTime = (newDistance / totalDistance) * animationDuration;
                 
-                // Loop continuo
+                // Aggiorna l'indicatore di distanza
+                const distanceInMeters = Math.round((animationTime / animationDuration) * totalRouteDistance);
+                const remainingDistance = totalRouteDistance - distanceInMeters;
+                updateDistanceIndicator(remainingDistance); // Ora mostriamo la distanza residua
+                
+                // Controllo per fine percorso
                 if (animationTime >= animationDuration) {
-                    animationTime = 0;
-                    lastTimestamp = timestamp;
+                    // Controllo per l'animazione di completamento
+                    if (!completionMessageShown) {
+                        showFinishFlag();
+                        showEndImage(); // Mostra l'immagine di destinazione
+                        completionMessageShown = true;
+                        playing = false; // Ferma l'animazione
+                        // Nascondiamo l'indicatore quando si arriva a destinazione
+                        distanceIndicator.style.visibility = 'hidden';
+                        
+                        // Riprendi l'animazione dopo una pausa prolungata
+                        setTimeout(() => {
+                            if (finishFlagMarker) {
+                                map.removeLayer(finishFlagMarker);
+                                finishFlagMarker = null;
+                            }
+                            hideEndImage(); // Nascondi l'immagine di destinazione
+                            completionMessageShown = false;
+                            initialPauseComplete = false; // Reset per la prossima iterazione
+                            initialPauseStartTime = performance.now(); // Reimposta il tempo di pausa iniziale
+                            animationTime = 0;
+                            playing = true;
+                            
+                            // Mostra immediatamente l'immagine iniziale quando inizia un nuovo ciclo
+                            showStartImage();
+                        }, endPauseDuration * 1000); // Converte in millisecondi
+                    }
                 }
             }
             
@@ -349,10 +653,140 @@
             // Aggiorna marker
             marker.setLatLng([position.lat, position.lon]);
             
+            // Aggiorna la posizione dell'indicatore di distanza
+            updateDistanceIndicatorPosition([position.lat, position.lon]);
+            
+            // Controllo per mostrare/nascondere le immagini
+            const distanceToStart = calculateDistance(position.lat, position.lon, gpxData[0].lat, gpxData[0].lon);
+            const distanceToEnd = calculateDistance(position.lat, position.lon, gpxData[gpxData.length - 1].lat, gpxData[gpxData.length - 1].lon);
+            
+            // Soglia di distanza in metri per mostrare l'immagine (circa 20 metri)
+            const proximityThreshold = 20;
+            
+            // Gestione immagine di partenza (solo durante il percorso attivo)
+            if (initialPauseComplete && distanceToStart <= proximityThreshold) {
+                showStartImage();
+            } else if (initialPauseComplete && distanceToStart > proximityThreshold) {
+                hideStartImage();
+            }
+            
+            // Gestione immagine di arrivo (solo quando non è già visualizzata dall'animazione di completamento)
+            if (distanceToEnd <= proximityThreshold && !completionMessageShown) {
+                showEndImage();
+            } else if (!completionMessageShown && distanceToEnd > proximityThreshold) {
+                hideEndImage();
+            }
+            
             // Segui marker sempre attivo
             map.panTo([position.lat, position.lon]);
             
             requestAnimationFrame(animate);
+        }
+        
+        // Funzione per mostrare la bandierina di arrivo
+        function showFinishFlag() {
+            if (finishFlagMarker) {
+                map.removeLayer(finishFlagMarker);
+            }
+            
+            // Posiziona la bandierina sotto al marker di destinazione
+            finishFlagMarker = L.marker([gpxData[gpxData.length - 1].lat - 0.00015, gpxData[gpxData.length - 1].lon], { 
+                icon: finishFlagIcon,
+                zIndexOffset: 1000 // Assicura che sia sopra gli altri marker
+            }).addTo(map);
+        }
+        
+        // Funzioni per gestire la visualizzazione delle immagini
+        function showStartImage() {
+            if (startImageMarker && !map.hasLayer(startImageMarker)) {
+                startImageMarker.addTo(map);
+                // Aggiungi timer per applicare la classe per l'animazione
+                setTimeout(() => {
+                    document.querySelectorAll('.image-icon img').forEach(img => {
+                        if (img.src.includes('main.jpg')) {
+                            img.classList.add('image-visible');
+                            // Trova la didascalia associata e mostrala
+                            const caption = img.parentNode.querySelector('.image-caption');
+                            if (caption) {
+                                caption.classList.add('caption-visible');
+                            }
+                        }
+                    });
+                }, 50);
+            }
+        }
+        
+        function hideStartImage() {
+            if (startImageMarker && map.hasLayer(startImageMarker)) {
+                // Prima rimuovi la classe per animare l'uscita
+                document.querySelectorAll('.image-icon img').forEach(img => {
+                    if (img.src.includes('main.jpg')) {
+                        img.classList.remove('image-visible');
+                        // Trova la didascalia associata e nascondila
+                        const caption = img.parentNode.querySelector('.image-caption');
+                        if (caption) {
+                            caption.classList.remove('caption-visible');
+                        }
+                    }
+                });
+                // Aspetta che l'animazione finisca prima di rimuovere
+                setTimeout(() => {
+                    if (startImageMarker && map.hasLayer(startImageMarker)) {
+                        map.removeLayer(startImageMarker);
+                    }
+                }, 800);
+            }
+        }
+        
+        function showEndImage() {
+            if (endImageMarker && !map.hasLayer(endImageMarker)) {
+                endImageMarker.addTo(map);
+                // Aggiungi timer per applicare la classe per l'animazione
+                setTimeout(() => {
+                    document.querySelectorAll('.image-icon img').forEach(img => {
+                        if (img.src.includes('platz2.jpg')) {
+                            img.classList.add('image-visible');
+                            // Trova la didascalia associata e mostrala
+                            const caption = img.parentNode.querySelector('.image-caption');
+                            if (caption) {
+                                caption.classList.add('caption-visible');
+                            }
+                        }
+                    });
+                }, 50);
+            }
+        }
+        
+        function hideEndImage() {
+            if (endImageMarker && map.hasLayer(endImageMarker)) {
+                // Prima rimuovi la classe per animare l'uscita
+                document.querySelectorAll('.image-icon img').forEach(img => {
+                    if (img.src.includes('platz2.jpg')) {
+                        img.classList.remove('image-visible');
+                        // Trova la didascalia associata e nascondila
+                        const caption = img.parentNode.querySelector('.image-caption');
+                        if (caption) {
+                            caption.classList.remove('caption-visible');
+                        }
+                    }
+                });
+                // Aspetta che l'animazione finisca prima di rimuovere
+                setTimeout(() => {
+                    if (endImageMarker && map.hasLayer(endImageMarker)) {
+                        map.removeLayer(endImageMarker);
+                    }
+                }, 800);
+            }
+        }
+        
+        // Funzione per mostrare il messaggio di completamento (rimosso ma teniamo la funzione per compatibilità)
+        function showCompletionMessage() {
+            // Non utilizziamo più questa funzione
+        }
+        
+        // Funzione per nascondere il messaggio di completamento (rimosso ma teniamo la funzione per compatibilità)
+        function hideCompletionMessage() {
+            // Non utilizziamo più questa funzione
         }
         
         // Calcola la distanza tra due punti usando la formula di Haversine
@@ -368,6 +802,58 @@
                     Math.sin(Δλ/2) * Math.sin(Δλ/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
             return R * c;
+        }
+
+        // Funzione per creare l'indicatore di distanza
+        function createDistanceIndicator() {
+            // Rimuovi eventuali indicatori esistenti
+            if (document.querySelector('.distance-indicator')) {
+                document.querySelector('.distance-indicator').remove();
+            }
+            
+            // Crea l'elemento per l'indicatore
+            distanceIndicator = document.createElement('div');
+            distanceIndicator.className = 'distance-indicator';
+            distanceIndicator.innerHTML = `
+                <svg class="dest-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#fff" stroke="#e02020" stroke-width="2">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                    <circle cx="12" cy="9" r="3" fill="#e02020" stroke="none"/>
+                </svg>
+                <span class="distance-value">${totalRouteDistance} m</span>
+            `;
+            
+            // Aggiungi l'indicatore alla mappa
+            document.getElementById('map').appendChild(distanceIndicator);
+        }
+        
+        // Funzione per aggiornare l'indicatore di distanza
+        function updateDistanceIndicator(remainingDistance) {
+            if (!distanceIndicator) return;
+            
+            // Aggiorna il testo con i metri residui
+            const distanceValue = distanceIndicator.querySelector('.distance-value');
+            if (distanceValue) {
+                distanceValue.textContent = `${remainingDistance} m`;
+            }
+            
+            // Se la distanza rimanente è molto piccola (siamo quasi arrivati), nascondiamo l'indicatore
+            if (remainingDistance < 5) {
+                distanceIndicator.style.visibility = 'hidden';
+            } else {
+                distanceIndicator.style.visibility = 'visible';
+            }
+        }
+        
+        // Funzione per aggiornare la posizione dell'indicatore
+        function updateDistanceIndicatorPosition(markerPosition) {
+            if (!distanceIndicator) return;
+            
+            // Converti le coordinate geografiche in coordinate pixel
+            const markerPoint = map.latLngToContainerPoint(L.latLng(markerPosition));
+            
+            // Posiziona l'indicatore sopra il marker
+            distanceIndicator.style.left = `${markerPoint.x}px`;
+            distanceIndicator.style.top = `${markerPoint.y}px`;
         }
 
         // Aggiorniamo la mappa al caricamento e iniziamo l'animazione
@@ -401,6 +887,15 @@
         setTimeout(() => {
             map.invalidateSize();
         }, 500);
+
+        // Impedisci di uscire dalla modalità a schermo intero
+        document.addEventListener('keydown', function(e) {
+            // Previeni l'uso di ESC o F11 per uscire dalla modalità full screen
+            if (e.key === 'Escape' || e.key === 'F11') {
+                e.preventDefault();
+                return false;
+            }
+        }, false);
     </script>
 </body>
 </html>
