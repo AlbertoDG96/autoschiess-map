@@ -58,8 +58,9 @@
         }
         /* Stili per le immagini permanenti */
         .permanent-image {
-            max-width: 80px;
-            max-height: 60px;
+            width: 280px;
+            height: 280px;
+            object-fit: cover;
             border: 2px solid white;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
@@ -233,22 +234,22 @@
 
         // Aggiunta delle immagini sempre visibili
         // Immagine punto di partenza
-        L.marker([gpxData[0].lat + 0.00015, gpxData[0].lon + 0.0002], {
+        L.marker([gpxData[0].lat + 0.0005, gpxData[0].lon + 0.0012], {
             icon: L.divIcon({
-                html: '<img src="https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" class="permanent-image">',
+                html: '<img src="main.jpg" class="permanent-image">',
                 className: 'image-icon',
-                iconSize: [80, 60],
-                iconAnchor: [40, 30]
+                iconSize: [280, 280],
+                iconAnchor: [140, 140]
             })
         }).addTo(map);
 
         // Immagine punto di arrivo
-        L.marker([gpxData[gpxData.length - 1].lat + 0.00015, gpxData[gpxData.length - 1].lon + 0.0002], {
+        L.marker([gpxData[gpxData.length - 1].lat + 0.0005, gpxData[gpxData.length - 1].lon + 0.0012], {
             icon: L.divIcon({
-                html: '<img src="https://images.unsplash.com/photo-1569949381669-ecf31ae8e613?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" class="permanent-image">',
+                html: '<img src="platz2.jpg" class="permanent-image">',
                 className: 'image-icon',
-                iconSize: [80, 60],
-                iconAnchor: [40, 30]
+                iconSize: [280, 280],
+                iconAnchor: [140, 140]
             })
         }).addTo(map);
 
